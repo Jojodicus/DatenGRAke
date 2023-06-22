@@ -24,7 +24,7 @@ public class WorkerThread extends Thread {
             String idmString = new String(idm);
 
             // check if IdM is valid
-            if (!Globals.IDM_PATTERN.matcher(idmString).matches()) {
+            if (!Globals.CRASH_IDENTIFIER.equals(idmString) && !Globals.IDM_PATTERN.matcher(idmString).matches()) {
                 System.err.println("Invalid IdM: " + idmString);
                 return;
             }
