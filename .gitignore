@@ -28,3 +28,6 @@ replay_pid*
 
 # collected data
 telemetry-data/
+
+# key files
+*.key

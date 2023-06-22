@@ -17,6 +17,9 @@ public class MainServer {
             return;
         }
 
+        // initialize crypto
+        Crypto.init();
+
         // open server socket
         ServerSocket serverSocket;
         try {

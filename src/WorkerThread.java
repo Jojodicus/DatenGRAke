@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
 public class WorkerThread extends Thread {
@@ -14,14 +15,23 @@ public class WorkerThread extends Thread {
         try {
             // get input stream
             InputStream inputStream = socket.getInputStream();
+            OutputStream outputStream = socket.getOutputStream();
+
+            // handshake
+            Crypto.handshake(inputStream, outputStream);
+
+            // read encypted data
+            byte[] encryptedData = new byte[Globals.MAX_LENGTH];
+            int encryptedDataLength = inputStream.read(encryptedData);
+
+            // decrypt data
+            byte[] data = Crypto.decrypt(encryptedData, encryptedDataLength);
+
+            // convert to string
+            String dataString = new String(data);
 
             // read IdM
-            byte[] idm = new byte[Globals.IDM_LENGTH];
-            if (inputStream.read(idm) != Globals.IDM_LENGTH) {
-                System.err.println("Could not read IdM");
-                return;
-            }
-            String idmString = new String(idm);
+            String idmString = dataString.substring(0, Globals.IDM_LENGTH);
 
             // check if IdM is valid
             if (!Globals.CRASH_IDENTIFIER.equals(idmString) && !Globals.IDM_PATTERN.matcher(idmString).matches()) {
@@ -30,12 +40,10 @@ public class WorkerThread extends Thread {
             }
 
             // read rest of data (file contents)
-            byte[] data = new byte[Globals.MAX_FILE_SIZE];
-            int bytesRead = inputStream.read(data);
-            String dataString = new String(data, 0, bytesRead);
+            String restString = dataString.substring(Globals.IDM_LENGTH);
 
             // save file
-            if (!FileSaver.saveFile(idmString, dataString)) {
+            if (!FileSaver.saveFile(idmString, restString)) {
                 System.err.println("Could not save file");
                 return;
             }

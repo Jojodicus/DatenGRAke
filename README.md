@@ -25,6 +25,8 @@ java -jar DatenGRAke.jar
 
 ## Data format
 
+Before exchanging data, the client sends the server an AES key which is encrypted with the servers' RSA public key (the pair has to be generated and distributed beforehand). For this, the client generates a key, then sends a 16 byte short indicating the length of the key. After that, the key is sent. An example Client can be seen [here](example-client/).
+
 The data format is rather simple:
 
 `<IdM><file-contents>`
