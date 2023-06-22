@@ -18,7 +18,10 @@ public class WorkerThread extends Thread {
             OutputStream outputStream = socket.getOutputStream();
 
             // handshake
-            Crypto.handshake(inputStream, outputStream);
+            if (!Crypto.handshake(inputStream, outputStream)) {
+                System.err.println("Handshake failed");
+                return;
+            }
 
             // read encypted data
             byte[] encryptedData = new byte[Globals.MAX_LENGTH];
@@ -26,6 +29,11 @@ public class WorkerThread extends Thread {
 
             // decrypt data
             byte[] data = Crypto.decrypt(encryptedData, encryptedDataLength);
+
+            if (data == null) {
+                System.err.println("Decryption failed");
+                return;
+            }
 
             // convert to string
             String dataString = new String(data);
